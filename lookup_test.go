@@ -15,6 +15,19 @@ type S struct{}
 
 var _ = Suite(&S{})
 
+func (s *S) TestLookup_Slice(c *C) {
+	values := []struct{ X []int }{
+		{X: []int{1, 2, 3}},
+	}
+	value, err := LookupString(values, "[0].X[1]")
+	c.Assert(err, IsNil)
+	c.Assert(value.Int(), Equals, int64(2))
+
+	value, err = LookupString(values, "[0].X.[1]")
+	c.Assert(err, IsNil)
+	c.Assert(value.Int(), Equals, int64(2))
+}
+
 func (s *S) TestLookup_Map(c *C) {
 	value, err := Lookup(map[string]int{"foo": 42}, "foo")
 	c.Assert(err, IsNil)
@@ -105,7 +118,6 @@ func (s *S) TestAggregableLookupString_Complex(c *C) {
 		{"baz": 2},
 		{"baz": 3},
 	})
-
 }
 
 func (s *S) TestAggregableLookup_EmptySlice(c *C) {

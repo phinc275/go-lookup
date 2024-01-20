@@ -22,6 +22,7 @@ var (
 	ErrInvalidIndexUsage = errors.New("invalid index key usage")
 	ErrKeyNotFound       = errors.New("unable to find the key")
 	ErrIndexOutOfBounds  = errors.New("index out of bounds")
+	ErrInvalidKeyUsage   = errors.New("")
 )
 
 // LookupString performs a lookup into a value, using a string. Same as `Lookup`
@@ -86,6 +87,11 @@ func getValueByName(v reflect.Value, key string, caseInsensitive bool) (reflect.
 		return value, err
 	}
 	switch v.Kind() {
+	case reflect.Slice:
+		if key != "" {
+			return reflect.Value{}, ErrInvalidKeyUsage
+		}
+		value = v
 	case reflect.Ptr, reflect.Interface:
 		return getValueByName(v.Elem(), prevKey, caseInsensitive)
 	case reflect.Struct:
